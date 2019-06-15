@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use JWTAuth;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -35,5 +37,31 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    protected function login()
+    {
+        $credentails = request()->only('email', 'password');
+        try {
+           $user  = JWTAuth::attempt($credentails);
+           if (!$user) {
+               return response()->json([
+                   'message' => 'Invalid login credentails',
+                   'success' => false
+               ], Response::HTTP_BAD_REQUEST);
+           } 
+           return response()->json([
+               'token' => $user,
+               'username' => request('username'),
+               'success' => true
+           ]);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'message' => 'Unable to create token',
+                'success' => false,
+                'error'  => $e->getMessage()
+            ]);
+        }
+        return response()->json($credentails);
     }
 }
