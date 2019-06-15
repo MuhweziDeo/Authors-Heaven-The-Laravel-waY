@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
+use JWTAuth;
+use App\Models\User;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,7 +31,6 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
 
     /**
      * Create a new controller instance.
@@ -40,33 +42,50 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+
+    protected function register()
+    {   
+        $validator = User::validator(request()->all());
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+        $existingUser = User::validateUserExistance(request()->all());
+
+        if (!$existingUser) {    
+            $user = User::create(request()->all());
+            User::sendEmailConfirmationEmail($user);
+            return response()->json([ 'data' => $user, 
+            'success' => true,
+            'message' => 'Email verification link has been sent to your email check your email to complete registration'], Response::HTTP_CREATED);
+        }
+        
+        return response()->json([
+            'message' => 'username or email already taken',
+            'success' => false ], Response::HTTP_CONFLICT);
+
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
-     */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+    protected function emailConfirmation() 
+    {   
+        $email = JWTAuth::parseToken()->authenticate()->email;
+
+        $user = User::where('email', $email)->first();
+
+        if ($user->is_verified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'email already verified'
+            ], Response::HTTP_OK);
+        }
+        $user->is_verified = true;
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        $access_token = JWTAuth::fromUser($user);
+        return response()->json([
+            'message' => 'email successfully verified',
+            'sucess' => 'true',
+            'data' => $user,
+            'token' => $access_token
+        ], Response::HTTP_OK);
     }
 }
