@@ -30,4 +30,28 @@ class ProfileController extends Controller
             'success' => true
         ],Response::HTTP_OK);
     }
+
+    protected function update($username)
+    {   
+        
+        if (request()->user->username !== $username) {
+            return response()->json([
+                'message' => 'Permission Denied',
+                'success' => false
+            ],Response::HTTP_FORBIDDEN);
+        }
+        $profile = Profile::updateProfile($username,request()->only('first_name', 'last_name', 'image'));
+        if ($profile['errors']) {
+            return response()->json([
+                'errors' => $profile['errors'],
+                'sucess' => false
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        return response()->json([
+            'message' => 'Profile update successfully',
+            'sucess' => true
+        ], Response::HTTP_OK);
+      
+    }
+
 }
