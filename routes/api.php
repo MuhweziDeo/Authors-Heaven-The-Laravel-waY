@@ -20,8 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('signup', 'Auth\RegisterController@register');
 Route::put('verify/{token}/confirmation', 'Auth\RegisterController@emailConfirmation');
 Route::post('login', 'Auth\LoginController@login');
-
 // Profiles
+
 Route::get('profiles', 'ProfileController@index');
 Route::get('profiles/{username}','ProfileController@show');
-Route::patch('profiles/{username}','ProfileController@update')->middleware('tokenAuthentication');
