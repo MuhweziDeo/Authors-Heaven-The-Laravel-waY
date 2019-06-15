@@ -19,3 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('signup', 'Auth\RegisterController@register');
 Route::put('verify/{token}/confirmation', 'Auth\RegisterController@emailConfirmation');
+
+// Profiles
+
+Route::get('profiles', 'ProfileController@index');
+Route::get('profiles/{username}','ProfileController@show');
