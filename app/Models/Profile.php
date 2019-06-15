@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class Profile extends Model
 {
     //
+    protected $fillable = ['first_name', 'last_name', 'image' ];
 
     public function user()
     {
@@ -22,5 +24,33 @@ class Profile extends Model
     protected static function getSingleProfile (string $username)
     {
         return Profile::with('user')->where('username', $username)->first();
+    }
+
+    protected static function validator($data)
+    {
+        return Validator::make($data,[
+            'first_name' => ['string', 'min:3'],
+            'last_name' => ['string', 'min:3'], 
+            'image'  => ['string', 'min:3']
+        ]);
+    }
+
+    protected static function updateProfile(string $username, Array $data)
+    {
+        if (count($data) === 0) {
+            return [
+                'errors' => 'Please enter at least one value of first_name, last_name, image'
+            ];
+        }
+        
+        $validator = Profile::validator(request()->all());
+
+        if ($validator->fails()) {
+            return [
+                'errors' => $validator->errors()
+            ];
+        } 
+        return Profile::where('username', $username)
+                        ->update($data);
     }
 }
