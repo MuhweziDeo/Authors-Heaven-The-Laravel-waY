@@ -118,4 +118,35 @@ class User extends Authenticatable implements JWTSubject
         $email = JWTAuth::authenticate($token)->email;
         return $email;
     }
+
+    public static function findUserByEmail(string $email)
+    {
+        return User::where('email', $email)->first();
+    }
+
+    public function sendResetPasswordEmail(User $user)
+    {
+        $token = JWTAuth::fromUser($user);
+        $domain = env('ACTIVATION_URL');
+        $reset_url = "{$domain}password-reset/$token/confirm";
+        \Mail::to($user)->send(new \App\Mail\PasswordResetEmail($user,$reset_url));
+    }
+
+    public static function setNewPassword(string $email, Array $data)
+    {
+        $validator = Validator::make($data, [
+            'password' => ['string', 'required', 'confirmed']
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'errors' => $validator->errors()
+            ];
+        }
+        $user = User::where('email', $email)->first();
+        $user->password = Hash::make($data['password']);
+        $user->save();
+        return $user;
+
+    }
 }

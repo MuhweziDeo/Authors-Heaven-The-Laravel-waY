@@ -20,6 +20,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('signup', 'Auth\RegisterController@register');
 Route::put('verify/{token}/confirmation', 'Auth\RegisterController@emailConfirmation');
 Route::post('login', 'Auth\LoginController@login');
+Route::post('password-reset/request', 'Auth\ResetPasswordController@resetPasswordRequest');
+Route::patch('password-reset/{token}/confirm','Auth\ResetPasswordController@resetPasswordConfirm');
 
 // Profiles
 Route::get('profiles', 'ProfileController@index');
