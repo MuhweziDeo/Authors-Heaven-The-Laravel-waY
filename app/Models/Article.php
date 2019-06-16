@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\ArticleFavorite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,6 +30,11 @@ class Article extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_uuid', 'uuid');
+    }
+
+    public function favourites()
+    {
+        return $this->hasMany(ArticleFavorite::class, 'article_slug', 'slug');
     }
 
     public static function validator(Array $data) 
@@ -68,9 +74,11 @@ class Article extends Model
         ]);
     }
 
-    protected static function getAllArticles()
-    {
-        return Article::with('author')->orderBy('created_at', 'DESC')->paginate(10);
+    protected static function getAllArticles(Request $request)
+    {   
+        $articles = Article::with('author.profile', 'favourites.favouriteBy.profile')
+                            ->orderBy('created_at', 'DESC')->paginate(10);
+        return $articles;
     }
 
     protected static function deleteArticle(string $slug)
