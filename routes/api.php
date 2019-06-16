@@ -27,3 +27,10 @@ Route::patch('password-reset/{token}/confirm','Auth\ResetPasswordController@rese
 Route::get('profiles', 'ProfileController@index');
 Route::get('profiles/{username}','ProfileController@show');
 Route::patch('profiles/{username}','ProfileController@update')->middleware('tokenAuthentication');
+
+// Articles
+Route::post('articles', 'ArticlesController@create')
+        ->middleware('tokenAuthentication');
+Route::get('articles', 'ArticlesController@index');
+Route::delete('articles/{slug}', 'ArticlesController@destroy')->middleware('tokenAuthentication');
+Route::patch('articles/{slug}', 'ArticlesController@update')->middleware('tokenAuthentication');
