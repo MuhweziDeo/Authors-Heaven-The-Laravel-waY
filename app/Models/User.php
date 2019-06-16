@@ -4,6 +4,7 @@ namespace App\Models;
 
 use JWTAuth;
 use App\Models\User;
+use App\Models\Article;
 use Illuminate\Support\Str;
 use App\Mail\EmailConfirmationMail;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +57,11 @@ class User extends Authenticatable implements JWTSubject
     protected function profile()
     {
         return $this->hasOne('App\Models\Profile', 'username');
+    }
+
+    protected function articles()
+    {
+        return $this->hasMany(Article::class, 'author_uuid', 'uuid');
     }
 
 
