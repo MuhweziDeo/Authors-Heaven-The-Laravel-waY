@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\ArticleDisLike;
+use App\Models\ArticleLike;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -37,6 +39,16 @@ class Article extends Model
         return $this->hasMany(ArticleFavorite::class, 'article_slug', 'slug');
     }
 
+    public function likes()
+    {
+        return $this->hasMany(ArticleLike::class, 'article_slug', 'slug');
+    }
+
+    public function disLikes()
+    {
+        return $this->hasMany(ArticleDisLike::class, 'article_slug', 'slug');
+    }
+
     public static function validator(Array $data) 
     {
         return Validator::make($data, Article::$rules);
@@ -47,6 +59,20 @@ class Article extends Model
     {
         return Article::where('slug', $slug)->first();
     }
+
+    protected static function checkIfcanFavouriteOrLike(Request $request, Article $article, $model)
+    {
+
+        $isAuthor = $request->user->uuid === $article->author_uuid;
+        $isFavouritedorLiked = $model::where('article_slug', $article->slug)
+                                        ->where('user_uuid', $request->user->uuid)->first();
+        if ($isAuthor || $isFavouritedorLiked ){
+            return false;
+        }
+        return true;
+        
+    }
+
 
     protected static function checkIsOwner(Request $request, Article $article)
     {
@@ -76,9 +102,19 @@ class Article extends Model
 
     protected static function getAllArticles(Request $request)
     {   
-        $articles = Article::with('author.profile', 'favourites.favouriteBy.profile')
+        $articles = Article::with('author.profile', 'likes.likedBy.profile', 'disLikes.disLikeBy.profile',
+                                    'favourites.favouriteBy.profile')
                             ->orderBy('created_at', 'DESC')->paginate(10);
         return $articles;
+    }
+
+    public static function getSingleArticle($slug)
+    {
+        $article = Article::with('author.profile', 'likes.likedBy.profile', 'disLikes.disLikeBy.profile',
+                                    'favourites.favouriteBy.profile')
+                            ->where('slug', $slug)->first();
+        return $article;
+
     }
 
     protected static function deleteArticle(string $slug)

@@ -35,6 +35,21 @@ class ArticlesController extends Controller
         return response()->json($articles, Response::HTTP_OK); ;
     }
 
+    protected function show($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not Found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([
+            'article' => Article::getSingleArticle($slug)
+            ]);
+
+    }
+
     protected function destroy(Request $request, $slug)
     {
         $article = Article::findArticleBySlug($slug);
@@ -96,12 +111,12 @@ class ArticlesController extends Controller
                 'message' => 'Article not found'
             ], Response::HTTP_NOT_FOUND);
         }
-        $canFavourite = ArticleFavorite::checkIfcanFavourite(request(),$article);
+        $canFavourite = Article::checkIfcanFavouriteOrLike(request(), $article, ArticleFavorite::class);
         if (!$canFavourite) {
             return response()->json([
                 'message' => 'You already liked this article or you authored it',
                 'success' => false
-            ], Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_NOT_ACCEPTABLE);
         }
         $data['slug'] = $slug;
         $data['user_uuid'] = request()->user->uuid;
@@ -121,16 +136,119 @@ class ArticlesController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $unfavourite = ArticleFavorite::unfavouriteArticle(request()->user->uuid, $slug);
-        if (!$unfavourite) {
+        $hasNotFavourite = Article::checkIfcanFavouriteOrLike(request(), $article, ArticleFavorite::class);
+        if ($hasNotFavourite) {
             return response()->json([
                 'message' => 'You have not favourited this article before',
                 'success' => false
-            ], Response::HTTP_NOT_FOUND);
+            ], Response::HTTP_NOT_ACCEPTABLE);
         }
+        $unfavourite = ArticleFavorite::unfavouriteArticle(request()->user->uuid, $slug);
         return response()->json([
             'message' => 'You have unfavourited this article',
             'success' => false
+        ], Response::HTTP_OK);
+
+    }
+
+    protected function likeArticle($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $canLike = Article::checkIfcanFavouriteOrLike(request(), $article, \App\Models\ArticleLike::class);
+        if (!$canLike) {
+            return response()->json([
+                'message' => 'You have liked this article or you authored it',
+                'success' => false
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $likeArticle = \App\Models\ArticleLike::likeArticle($data);
+        return response()->json([
+            'message' => 'You have sucessfully liked the article',
+            'success' => true
+        ], Response::HTTP_OK);
+    }
+
+    protected function unlikeArticle($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $canUnLike = Article::checkIfcanFavouriteOrLike(request(), $article, \App\Models\ArticleLike::class);
+        if ($canUnLike) {
+            return response()->json([
+                'message' => 'You have not liked this article or you authored it',
+                'success' => false
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $likeArticle = \App\Models\ArticleLike::removeArticleLike($data);
+        return response()->json([
+            'message' => 'You have sucessfully unliked the article',
+            'success' => true
+        ], Response::HTTP_OK);
+
+    }
+
+    protected function disLikeArticle($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $canDisLike = Article::checkIfcanFavouriteOrLike(request(), $article, \App\Models\ArticleDisLike::class);
+        if (!$canDisLike) {
+            return response()->json([
+                'message' => 'You have already disLiked this article or you authored it',
+                'success' => false
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $likeArticle = \App\Models\ArticleDisLike::disLikeArticle($data);
+        return response()->json([
+            'message' => 'You have sucessfully disLiked the article',
+            'success' => true
+        ], Response::HTTP_OK);
+    }
+
+    protected function removeArticleDisLike($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $isNotLikedArticle = Article::checkIfcanFavouriteOrLike(request(), $article, \App\Models\ArticleDisLike::class);
+        if ($isNotLikedArticle) {
+            return response()->json([
+                'message' => 'You have not disLiked this article or you authored it',
+                'success' => false
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $likeArticle = \App\Models\ArticleDisLike::deleteArticleDiskLike($data);
+        return response()->json([
+            'message' => 'You have sucessfully removed your disLike on this article',
+            'success' => true
         ], Response::HTTP_OK);
 
     }
