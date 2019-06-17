@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request;
+use App\Models\ArticleFavorite;
 use \Symfony\Component\HttpFoundation\Response;
+use JWTAuth;
 
 class ArticlesController extends Controller
 {
@@ -29,7 +31,8 @@ class ArticlesController extends Controller
 
     protected function index()
     {   
-        return response()->json(Article::getAllArticles(), Response::HTTP_OK); ;
+        $articles = Article::getAllArticles(request());
+        return response()->json($articles, Response::HTTP_OK); ;
     }
 
     protected function destroy(Request $request, $slug)
@@ -84,6 +87,54 @@ class ArticlesController extends Controller
             'success' => $updateArticle
         ],Response::HTTP_OK);
     }
+
+    protected function favouriteArticle($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+        $canFavourite = ArticleFavorite::checkIfcanFavourite(request(),$article);
+        if (!$canFavourite) {
+            return response()->json([
+                'message' => 'You already liked this article or you authored it',
+                'success' => false
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        $data['slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $favourite = ArticleFavorite::favouriteArticle($data); 
+        return response()->json([
+            'message' => 'article favourited successfully',
+            'success' => true
+        ], Response::HTTP_OK);
+    }
+
+    protected function unfavouriteArticle($slug)
+    {
+        $article = Article::findArticleBySlug($slug);
+        if (!$article) {
+            return response()->json([
+                'message' => 'Article not found'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $unfavourite = ArticleFavorite::unfavouriteArticle(request()->user->uuid, $slug);
+        if (!$unfavourite) {
+            return response()->json([
+                'message' => 'You have not favourited this article before',
+                'success' => false
+            ], Response::HTTP_NOT_FOUND);
+        }
+        return response()->json([
+            'message' => 'You have unfavourited this article',
+            'success' => false
+        ], Response::HTTP_OK);
+
+    }
+
 
     
 }

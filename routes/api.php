@@ -29,8 +29,9 @@ Route::get('profiles/{username}','ProfileController@show');
 Route::patch('profiles/{username}','ProfileController@update')->middleware('tokenAuthentication');
 
 // Articles
-Route::post('articles', 'ArticlesController@create')
-        ->middleware('tokenAuthentication');
+Route::post('articles', 'ArticlesController@create')->middleware('tokenAuthentication');
 Route::get('articles', 'ArticlesController@index');
 Route::delete('articles/{slug}', 'ArticlesController@destroy')->middleware('tokenAuthentication');
 Route::patch('articles/{slug}', 'ArticlesController@update')->middleware('tokenAuthentication');
+Route::put('articles/{slug}/favourite','ArticlesController@favouriteArticle')->middleware('tokenAuthentication');
+Route::delete('articles/{slug}/favourite','ArticlesController@unfavouriteArticle')->middleware('tokenAuthentication');
