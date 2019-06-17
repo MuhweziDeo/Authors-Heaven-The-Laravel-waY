@@ -21,19 +21,7 @@ class ArticleFavorite extends Model
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
-    protected static function checkIfcanFavourite(Request $request, Article $article)
-    {
-
-        $isAuthor = $request->user->uuid === $article->author_uuid;
-        $isFavourited = ArticleFavorite::where('article_slug', $article->slug)
-                                        ->where('user_uuid', $request->user->uuid)->first();
-        if ($isAuthor || $isFavourited ){
-            return false;
-        }
-        return true;
-        
-    }
-
+   
     protected function favouriteArticle(Array $data)
     {
 
