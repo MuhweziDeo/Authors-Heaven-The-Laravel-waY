@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\ArticleDisLike;
 use App\Models\ArticleLike;
+use App\Models\ArticleBookmark;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,7 +20,7 @@ class Article extends Model
     //
     protected $fillable = ['title', 'description', 'author_uuid', 'body', 'slug'];
     
-    protected $appends = ['isFavourite', 'averageRating', 'hasRated', 'currenUserRating'];
+    protected $appends = ['isFavourite', 'averageRating', 'hasRated', 'currenUserRating', 'hasBookMarked'];
 
     public function setSlugAttribute($slug)
     {   
@@ -53,6 +54,15 @@ class Article extends Model
            return $rating ? $rating->rating : null;
         }
         return null;
+    }
+
+    public function getHasBookMarkedAttribute()
+    {
+         // refactor Move to controller
+        if (request()->user) {
+            return ArticleBookmark::checkIfHasBookmarked(request()->user->uuid, $this->slug);
+         }
+         return false;
     }
 
     public function getAverageRatingAttribute()

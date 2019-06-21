@@ -41,6 +41,8 @@ Route::delete('articles/{slug}/like','ArticlesController@unlikeArticle')->middle
 Route::put('articles/{slug}/unlike','ArticlesController@disLikeArticle')->middleware('tokenAuthentication');
 Route::delete('articles/{slug}/unlike','ArticlesController@removeArticleDisLike')->middleware('tokenAuthentication');
 Route::post('articles/{slug}/rate', 'ArticlesController@rateArticle')->middleware('tokenAuthentication','articleExistenceMiddleware');
+Route::post('articles/{slug}/bookmark', 'ArticlesController@bookmarkArticle')->middleware('tokenAuthentication','articleExistenceMiddleware');
+Route::delete('articles/{slug}/bookmark', 'ArticlesController@unbookmarkArticle')->middleware('tokenAuthentication','articleExistenceMiddleware', 'bookMarkExistence');
 // Comments
 Route::post('articles/{slug}/comment', 'CommentController@create')->middleware('tokenAuthentication','articleExistenceMiddleware');
 Route::put('articles/{slug}/comment/{id}', 'CommentController@update')->middleware('tokenAuthentication','articleExistenceMiddleware','isCommentOwnerMiddleware');

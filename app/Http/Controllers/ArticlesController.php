@@ -6,6 +6,7 @@ use JWTAuth;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Models\ArticleRating;
+use App\Models\ArticleBookmark;
 use App\Models\ArticleFavorite;
 use \Symfony\Component\HttpFoundation\Response;
 
@@ -280,6 +281,40 @@ class ArticlesController extends Controller
             'success' => true,
             'data' =>  $rateArticle
         ]);
+    }
+
+    protected function bookmarkArticle($slug)
+    {
+        $canBookMark = Article::checkIfcanFavouriteOrLike(request(),request()->article,
+                                 \App\Models\ArticleBookmark::class);
+        if(!$canBookMark) {
+            return response()->json([
+                'message' => 'You already bookmarked this article or you authored it',
+                'success' => false
+            ], \Symfony\Component\HttpFoundation\Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $bookmarkArticle = ArticleBookmark::bookmarkArticle($data);
+        return response()->json([
+            'message' => 'Article bookmarked successfully',
+            'success' => true
+        ], \Symfony\Component\HttpFoundation\Response::HTTP_OK);
+    }
+
+    protected function unbookmarkArticle()
+    {
+        $unbookmark  = ArticleBookmark::deleteBookmark(request()->bookmark);
+        if ($unbookmark) {
+            return response()->json([
+                'message' => 'Successfully unbookmarked article',
+                'success' => true
+            ], \Symfony\Component\HttpFoundation\Response::HTTP_OK);
+        }
+        return response()->json([
+            'message' => 'unable to unbookmark article',
+            'sucess' => false
+        ], \Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
 

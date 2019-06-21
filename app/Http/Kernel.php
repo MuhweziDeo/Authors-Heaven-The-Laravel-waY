@@ -63,7 +63,8 @@ class Kernel extends HttpKernel
         'tokenAuthentication' => \App\Http\Middleware\TokenAuthentication::class,
         'articleExistenceMiddleware' => \App\Http\Middleware\ArticleExistanceMiddleware::class,
         'isCommentOwnerMiddleware' => \App\Http\Middleware\CommentPermissionMiddleware::class,
-        'getLoggedUser' => \App\Http\Middleware\AuthMiddleware::class
+        'getLoggedUser' => \App\Http\Middleware\AuthMiddleware::class,
+        'bookMarkExistence' => \App\Http\Middleware\BookMarkExistenceMiddleware::class
     ];
 
     /**
