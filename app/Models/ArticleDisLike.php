@@ -22,6 +22,7 @@ class ArticleDisLike extends Model
     protected static function disLikeArticle(Array $data)
     {
         $article_like = ArticleLike::where('article_slug', $data['article_slug'])
+                                    ->where('user_uuid', $data['user_uuid'])
                                     ->first();
         if ($article_like) {
             $article_like->delete();

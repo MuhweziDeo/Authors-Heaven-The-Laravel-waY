@@ -11,16 +11,53 @@ use Illuminate\Support\Carbon;
 use App\Models\ArticleFavorite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use JWTAuth;
+use App\Models\ArticleRating;
 
 class Article extends Model
 {
     //
     protected $fillable = ['title', 'description', 'author_uuid', 'body', 'slug'];
+    
+    protected $appends = ['isFavourite', 'averageRating', 'hasRated', 'currenUserRating'];
 
     public function setSlugAttribute($slug)
     {   
         $rand = Str::random();
         $this->attributes['slug'] = str_slug($slug . '-' . Carbon::now() . '-' . $rand);
+    }
+
+    public function getIsFavouriteAttribute()
+    {
+        //  refactor Move to controller
+        if (request()->user) {
+           return ArticleFavorite::checkIfHasFavourited(request()->user->uuid, $this->slug);
+        }
+        return false;
+    }
+
+    public function getHasRatedAttribute()
+    {
+        // refactor Move to controller
+        if (request()->user) {
+           return ArticleRating::checkIfUserHasRated(request()->user->uuid, $this->slug);
+        }
+        return false;
+    }
+
+    public function getCurrenUserRatingAttribute()
+    {
+        // refactor Move to controller
+        if (request()->user) {
+            $rating = ArticleRating::currentUserRating(request()->user->uuid, $this->slug);
+           return $rating ? $rating->rating : null;
+        }
+        return null;
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return ArticleRating::getAverageRatings($this->slug);
     }
 
     protected static $rules = [
@@ -49,11 +86,18 @@ class Article extends Model
         return $this->hasMany(ArticleDisLike::class, 'article_slug', 'slug');
     }
 
+    public function comments()
+    {
+        return $this->hasMany('App\Models\Comment', 'article_slug', 'slug');
+    }
+
+
     public static function validator(Array $data) 
     {
         return Validator::make($data, Article::$rules);
         
     }
+    
 
     public static function findArticleBySlug(string $slug)
     {
@@ -66,7 +110,7 @@ class Article extends Model
         $isAuthor = $request->user->uuid === $article->author_uuid;
         $isFavouritedorLiked = $model::where('article_slug', $article->slug)
                                         ->where('user_uuid', $request->user->uuid)->first();
-        if ($isAuthor || $isFavouritedorLiked ){
+        if ($isAuthor || $isFavouritedorLiked ) {
             return false;
         }
         return true;
@@ -100,10 +144,10 @@ class Article extends Model
         ]);
     }
 
-    protected static function getAllArticles(Request $request)
+    protected static function getAllArticles()
     {   
         $articles = Article::with('author.profile', 'likes.likedBy.profile', 'disLikes.disLikeBy.profile',
-                                    'favourites.favouriteBy.profile')
+                                    'favourites.favouriteBy.profile', 'comments.user.profile')
                             ->orderBy('created_at', 'DESC')->paginate(10);
         return $articles;
     }
@@ -111,7 +155,7 @@ class Article extends Model
     public static function getSingleArticle($slug)
     {
         $article = Article::with('author.profile', 'likes.likedBy.profile', 'disLikes.disLikeBy.profile',
-                                    'favourites.favouriteBy.profile')
+                                    'favourites.favouriteBy.profile', 'comments.user.profile')
                             ->where('slug', $slug)->first();
         return $article;
 
