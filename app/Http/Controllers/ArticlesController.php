@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use JWTAuth;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use App\Models\ArticleRating;
 use App\Models\ArticleFavorite;
 use \Symfony\Component\HttpFoundation\Response;
-use JWTAuth;
 
 class ArticlesController extends Controller
 {
@@ -31,7 +32,7 @@ class ArticlesController extends Controller
 
     protected function index()
     {   
-        $articles = Article::getAllArticles(request());
+        $articles = Article::getAllArticles();
         return response()->json($articles, Response::HTTP_OK); ;
     }
 
@@ -239,7 +240,7 @@ class ArticlesController extends Controller
         $isNotLikedArticle = Article::checkIfcanFavouriteOrLike(request(), $article, \App\Models\ArticleDisLike::class);
         if ($isNotLikedArticle) {
             return response()->json([
-                'message' => 'You have not disLiked this article or you authored it',
+                'message' => 'You have not disLiked this article',
                 'success' => false
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -251,6 +252,34 @@ class ArticlesController extends Controller
             'success' => true
         ], Response::HTTP_OK);
 
+    }
+
+    protected function rateArticle($slug)
+    {
+        $canRate  = Article::checkIfcanFavouriteOrLike(request(), request()->article, \App\Models\ArticleRating::class);
+        if(!$canRate) {
+            return response()->json([
+                'message' => 'You already rated this article or you authored it',
+                'success' => false
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        $data['article_slug'] = $slug;
+        $data['user_uuid'] = request()->user->uuid;
+        $data['rating'] = request('rating');
+
+        $rateArticle = ArticleRating::rateArticle($data);
+
+        if ($rateArticle['errors']) {
+            return response()->json([
+                'erros' => $rateArticle['errors'] ,
+                'success' => false
+            ]);
+        }
+        return response()->json([
+            'message' => 'Successfully rated article',
+            'success' => true,
+            'data' =>  $rateArticle
+        ]);
     }
 
 

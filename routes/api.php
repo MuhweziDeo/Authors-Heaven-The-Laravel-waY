@@ -30,8 +30,8 @@ Route::patch('profiles/{username}','ProfileController@update')->middleware('toke
 
 // Articles
 Route::post('articles', 'ArticlesController@create')->middleware('tokenAuthentication');
-Route::get('articles', 'ArticlesController@index');
-Route::get('articles/{slug}', 'ArticlesController@show');
+Route::get('articles', 'ArticlesController@index')->middleware('getLoggedUser');
+Route::get('articles/{slug}', 'ArticlesController@show')->middleware('getLoggedUser');
 Route::delete('articles/{slug}', 'ArticlesController@destroy')->middleware('tokenAuthentication');
 Route::patch('articles/{slug}', 'ArticlesController@update')->middleware('tokenAuthentication');
 Route::put('articles/{slug}/favourite','ArticlesController@favouriteArticle')->middleware('tokenAuthentication');
@@ -40,3 +40,11 @@ Route::put('articles/{slug}/like','ArticlesController@likeArticle')->middleware(
 Route::delete('articles/{slug}/like','ArticlesController@unlikeArticle')->middleware('tokenAuthentication');
 Route::put('articles/{slug}/unlike','ArticlesController@disLikeArticle')->middleware('tokenAuthentication');
 Route::delete('articles/{slug}/unlike','ArticlesController@removeArticleDisLike')->middleware('tokenAuthentication');
+Route::post('articles/{slug}/rate', 'ArticlesController@rateArticle')->middleware('tokenAuthentication','articleExistenceMiddleware');
+// Comments
+Route::post('articles/{slug}/comment', 'CommentController@create')->middleware('tokenAuthentication','articleExistenceMiddleware');
+Route::put('articles/{slug}/comment/{id}', 'CommentController@update')->middleware('tokenAuthentication','articleExistenceMiddleware','isCommentOwnerMiddleware');
+Route::delete('articles/{slug}/comment/{id}', 'CommentController@destroy')->middleware('tokenAuthentication','articleExistenceMiddleware','isCommentOwnerMiddleware');
+
+// Rating
+
