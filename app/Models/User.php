@@ -65,6 +65,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Article::class, 'author_uuid', 'uuid');
     }
 
+    public function followers()
+    {
+        return $this->hasMany(UserFollow::class, 'follower', 'uuid');
+    }
+
 
     /**
      * Get a validator for an incoming registration request.
@@ -129,6 +134,11 @@ class User extends Authenticatable implements JWTSubject
     public static function findUserByEmail(string $email)
     {
         return User::where('email', $email)->first();
+    }
+
+    public static function findUserByUuid(string $uuid)
+    {
+        return User::where('uuid', $uuid)->first();
     }
 
     public function sendResetPasswordEmail(User $user)
