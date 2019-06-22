@@ -64,7 +64,8 @@ class Kernel extends HttpKernel
         'articleExistenceMiddleware' => \App\Http\Middleware\ArticleExistanceMiddleware::class,
         'isCommentOwnerMiddleware' => \App\Http\Middleware\CommentPermissionMiddleware::class,
         'getLoggedUser' => \App\Http\Middleware\AuthMiddleware::class,
-        'bookMarkExistence' => \App\Http\Middleware\BookMarkExistenceMiddleware::class
+        'bookMarkExistence' => \App\Http\Middleware\BookMarkExistenceMiddleware::class,
+        'followMiddleware' => \App\Http\Middleware\FollowMiddleWare::class,
     ];
 
     /**

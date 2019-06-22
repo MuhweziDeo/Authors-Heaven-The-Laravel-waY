@@ -24,8 +24,8 @@ Route::post('password-reset/request', 'Auth\ResetPasswordController@resetPasswor
 Route::patch('password-reset/{token}/confirm','Auth\ResetPasswordController@resetPasswordConfirm');
 
 // Profiles
-Route::get('profiles', 'ProfileController@index');
-Route::get('profiles/{username}','ProfileController@show');
+Route::get('profiles', 'ProfileController@index')->middleware('getLoggedUser');
+Route::get('profiles/{username}','ProfileController@show')->middleware('getLoggedUser');
 Route::patch('profiles/{username}','ProfileController@update')->middleware('tokenAuthentication');
 
 // Articles
@@ -48,5 +48,8 @@ Route::post('articles/{slug}/comment', 'CommentController@create')->middleware('
 Route::put('articles/{slug}/comment/{id}', 'CommentController@update')->middleware('tokenAuthentication','articleExistenceMiddleware','isCommentOwnerMiddleware');
 Route::delete('articles/{slug}/comment/{id}', 'CommentController@destroy')->middleware('tokenAuthentication','articleExistenceMiddleware','isCommentOwnerMiddleware');
 
-// Rating
-
+//Follow
+Route::post('profiles/{uuid}/follow', 'UserFollowController@follow')->middleware('tokenAuthentication','followMiddleware');
+Route::get('profiles/{uuid}/followers', 'UserFollowController@followers')->middleware('followMiddleware');
+Route::get('profiles/{uuid}/following', 'UserFollowController@following')->middleware('followMiddleware');
+Route::delete('profiles/{uuid}/unfollow', 'UserFollowController@unfollow')->middleware('tokenAuthentication', 'followMiddleware');

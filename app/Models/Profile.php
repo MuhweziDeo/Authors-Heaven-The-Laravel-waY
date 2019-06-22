@@ -10,10 +10,21 @@ class Profile extends Model
 {
     //
     protected $fillable = ['first_name', 'last_name', 'image' ];
+    
+    protected $appends = ['isFollowing'];
+    //TODO add isFollowingAttribute;
 
     public function user()
     {
         return $this->belongsTo(User::class, 'username', 'username');
+    }
+
+    public function getIsFollowingAttribute()
+    {
+        if (request()->user) {
+            return UserFollow::checkIfIsFollowing(request()->user->uuid, $this->user->uuid);
+        }
+        return false;
     }
     
     protected static function getProfiles()
