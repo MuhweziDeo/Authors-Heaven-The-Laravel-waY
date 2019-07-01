@@ -1,6 +1,6 @@
 <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="false">
+      [mode]="over" [opened]="false">
       <mat-toolbar>Menu</mat-toolbar>
       <mat-nav-list>
         <a href=""><img fxLayout="row" fxLayoutAlign="center start" class="avatar" src="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt=""></a>
