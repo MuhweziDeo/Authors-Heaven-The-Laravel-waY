@@ -1,0 +1,27 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="false">
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-nav-list>
+      <a href=""><img fxLayout="row" fxLayoutAlign="center start" class="avatar" src="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt=""></a>
+      <a mat-list-item href="#">Profile</a>
+      <a mat-list-item href="#">Change Password</a>
+      <a mat-list-item href="#">Settings</a>
+      <a mat-list-item color="primary">Logout</a>
+      <a mat-list-item color="primary">Login</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar class="nav-items" fxLayout="row" fxLayoutAlign="space-between none" color="primary">
+      <span>Authors Heaven</span>
+      <div fxLayoutGap="10px" fxLayout="row" fxLayoutAlign="space-between none">
+        <mat-icon *ngIf="authenticated" matBadge="15" matBadgeColor="warn">home</mat-icon>
+        <button mat-flat-button>Get Started</button>
+        <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      </div>
+
+    </mat-toolbar>
+  </mat-sidenav-content>
+</mat-sidenav-container>
