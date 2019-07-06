@@ -1,0 +1,6 @@
+.taglist{
+    padding: 10px;
+}
+mat-chip {
+    cursor: pointer;
+}
