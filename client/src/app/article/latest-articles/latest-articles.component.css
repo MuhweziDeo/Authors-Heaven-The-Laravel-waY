@@ -1,0 +1,23 @@
+.user-avatar{
+    width: 80%;
+    border-radius: 3.5rem;
+    box-shadow: 0px 15px 45px -9px rgba(0, 0, 0, .2);
+    /* margin: 0px; */
+}
+
+.latest-posts-container{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 20px;
+    width: 80%;
+    /* justify-content: space-evenly; */
+    /* justify-items: end; */
+    margin-top: 10px;
+    
+}
+
+.post-content{
+    display: grid;
+    justify-content: center;
+    grid-gap: 0px;
+}
