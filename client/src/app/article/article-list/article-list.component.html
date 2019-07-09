@@ -1,15 +1,7 @@
 <div fxLayout="row wrap" fxLayoutAlign="none none" fxLayoutGap="30px" class="article-list">
-    <app-article-card></app-article-card>
+	<div *ngFor="let article of articles">
+		<app-article-card [article]="article"></app-article-card>
+	</div>
 
-    <app-article-card></app-article-card>
-
-    <app-article-card></app-article-card>
-
-    <app-article-card></app-article-card>
-
-    <app-article-card></app-article-card>
-
-    <app-article-card></app-article-card>
-
-    <app-article-card></app-article-card>
 </div>
+<button class="readmore__btn" mat-raised-button (click)="loadMoreArticles()" color="primary">Load More Posts</button>
