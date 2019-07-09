@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use JWTAuth;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Models\ArticleRating;
@@ -12,8 +11,7 @@ use \Symfony\Component\HttpFoundation\Response;
 
 class ArticlesController extends Controller
 {
-    //
-
+    
     protected function create()
     {   
         $data = request()->all();
@@ -32,9 +30,15 @@ class ArticlesController extends Controller
     }
 
     protected function index()
-    {   
-        $articles = Article::getAllArticles();
-        return response()->json($articles, Response::HTTP_OK); ;
+    {   $start = request()->input('start');
+        $end = request()->input('end');
+        $articles = Article::getAllArticles($start, $end);
+        return response()->json( [
+            'data' => $articles,
+            'limitStart' => $start,
+            'limitEnd' => $end,
+            'count' => count($articles) 
+            ], Response::HTTP_OK); ;
     }
 
     protected function show($slug)

@@ -154,11 +154,13 @@ class Article extends Model
         ]);
     }
 
-    protected static function getAllArticles()
+    protected static function getAllArticles($limitStart, $limitEnd)
     {   
-        $articles = Article::with('author.profile', 'likes.likedBy.profile', 'disLikes.disLikeBy.profile',
-                                    'favourites.favouriteBy.profile', 'comments.user.profile')
-                            ->orderBy('created_at', 'DESC')->paginate(10);
+        $start = $limitStart ? $limitStart : 0;
+        $end = $limitEnd ? $limitEnd : 10;
+        $articles = Article::with('author.profile', 'likes.likedBy.profile', 
+            'disLikes.disLikeBy.profile','favourites.favouriteBy.profile', 'comments.user.profile')
+                    ->skip($start)->take($end)->orderBy('created_at', 'DESC')->get();
         return $articles;
     }
 
