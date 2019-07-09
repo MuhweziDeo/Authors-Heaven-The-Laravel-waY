@@ -1,29 +1,21 @@
 <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="'over'" [opened]="false">
-      <mat-toolbar>Authors Heaven</mat-toolbar>
+      [mode]="over" [opened]="false">
+      <mat-toolbar>Menu</mat-toolbar>
       <mat-nav-list>
-        <div *ngIf="authenticated" class="auth">
-            <a href=""><img fxLayout="row" fxLayoutAlign="center start" class="avatar" src="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt=""></a>
+        <a href=""><img fxLayout="row" fxLayoutAlign="center start" class="avatar" src="https://images.pexels.com/photos/904276/pexels-photo-904276.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt=""></a>
         <a mat-list-item href="#">Profile</a>
         <a mat-list-item href="#">Change Password</a>
         <a mat-list-item href="#">Settings</a>
         <a mat-list-item color="primary">Logout</a>
-        </div>
-        <div *ngIf="!authenticated" class="not-auth">
-            <a mat-list-item color="primary">Login</a>
-            <a mat-list-item color="primary">Signup</a>
-            <a mat-list-item color="primary">Forgot Password</a>
-        </div>
-       
-        
+        <a mat-list-item color="primary">Login</a>
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content>
       <mat-toolbar class="nav-items" fxLayout="row" fxLayoutAlign="space-between center" color="primary">
         <span>Authors Heaven</span>
         <div fxLayoutGap="20px" fxLayout="row" fxLayoutAlign="space-between center">
-          <mat-icon *ngIf="authenticated"  matBadge="15" matBadgeColor="warn">home</mat-icon>
+          <mat-icon  matBadge="15" matBadgeColor="warn">home</mat-icon>
           <button class="curved-button" mat-flat-button>Get Started</button>
           <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
             <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
