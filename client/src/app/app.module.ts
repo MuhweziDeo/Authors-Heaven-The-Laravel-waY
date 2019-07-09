@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import {HttpClientModule} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AngularMaterialModule } from './angular-material.module';
@@ -14,7 +13,6 @@ import { TagsComponent } from './tags/tags.component';
 import { LatestArticlesComponent } from './article/latest-articles/latest-articles.component';
 import { SearchComponent } from './shared/search/search.component';
 import { BannerComponent } from './shared/banner/banner.component';
-import { LandingComponent } from './landing/landing.component';
 
 @NgModule({
   declarations: [
@@ -26,15 +24,13 @@ import { LandingComponent } from './landing/landing.component';
     TagsComponent,
     LatestArticlesComponent,
     SearchComponent,
-    BannerComponent,
-    LandingComponent
+    BannerComponent
   ],
   imports: [
     BrowserModule,
     AngularMaterialModule,
     LayoutModule,
-    BrowserAnimationsModule,
-    HttpClientModule
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

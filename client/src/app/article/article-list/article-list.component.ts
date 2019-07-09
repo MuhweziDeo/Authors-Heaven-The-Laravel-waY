@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { IArticle } from '../../shared/models/articles.model';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-article-list',
@@ -7,15 +6,10 @@ import { IArticle } from '../../shared/models/articles.model';
   styleUrls: ['./article-list.component.css']
 })
 export class ArticleListComponent implements OnInit {
-  @Input() articles: Array<IArticle>;
-  @Output() emitArticles = new EventEmitter();
+
   constructor() { }
 
   ngOnInit() {
-  }
-
-  loadMoreArticles() {
-    this.emitArticles.emit();
   }
 
 }
