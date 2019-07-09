@@ -19,3 +19,7 @@ body{
 .curved-button {
     border-radius: 30px;
 }
+
+.btn {
+    padding: 10px;
+}

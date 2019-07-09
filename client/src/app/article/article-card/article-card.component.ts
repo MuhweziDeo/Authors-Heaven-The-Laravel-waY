@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, Input } from '@angular/core';
+import {IArticle} from '../../shared/models/articles.model';
 @Component({
   selector: 'app-article-card',
   templateUrl: './article-card.component.html',
   styleUrls: ['./article-card.component.css']
 })
 export class ArticleCardComponent implements OnInit {
-  name: string;
+  @Input() article: IArticle;
   constructor() { }
 
   ngOnInit() {
