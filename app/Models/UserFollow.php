@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class UserFollow extends Model
@@ -53,7 +52,7 @@ class UserFollow extends Model
         return false;
     }
 
-    protected static function findUserFollow(string $followerUuid, $followeeUuid)
+    public static function findUserFollow(string $followerUuid, $followeeUuid)
     {
         return UserFollow::where('follower', $followerUuid)
                             ->where('followee',$followeeUuid )->first();
@@ -70,7 +69,7 @@ class UserFollow extends Model
 
     }
 
-    protected static function unfollowUser(UserFollow $follow)
+    public static function unfollowUser(UserFollow $follow)
     {
         return $follow->delete();
     }

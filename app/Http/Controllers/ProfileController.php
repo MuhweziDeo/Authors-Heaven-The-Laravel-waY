@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 
@@ -40,16 +39,18 @@ class ProfileController extends Controller
                 'success' => false
             ],Response::HTTP_FORBIDDEN);
         }
-        $profile = Profile::updateProfile($username,request()->only('first_name', 'last_name', 'image'));
+
+        $profile = Profile::updateProfile($username,
+            request()->only('first_name', 'last_name', 'image'));
         if ($profile['errors']) {
             return response()->json([
                 'errors' => $profile['errors'],
-                'sucess' => false
+                'success' => false
             ], Response::HTTP_BAD_REQUEST);
         }
         return response()->json([
             'message' => 'Profile update successfully',
-            'sucess' => true
+            'success' => true
         ], Response::HTTP_OK);
       
     }

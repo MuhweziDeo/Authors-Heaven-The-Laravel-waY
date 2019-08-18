@@ -7,8 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
@@ -44,29 +42,30 @@ class RegisterController extends Controller
 
 
     protected function register()
-    {   
+    {
         $validator = User::validator(request()->all());
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            $errors = \App\Helpers\ErrorHelper::formatErrors($validator);
+            return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
         }
         $existingUser = User::validateUserExistance(request()->all());
 
-        if (!$existingUser) {    
+        if (!$existingUser) {
             $user = User::create(request()->all());
             User::sendEmailConfirmationEmail($user);
-            return response()->json([ 'data' => $user, 
+            return response()->json([ 'data' => $user,
             'success' => true,
             'message' => 'Email verification link has been sent to your email check your email to complete registration'], Response::HTTP_CREATED);
         }
-        
+
         return response()->json([
             'message' => 'username or email already taken',
             'success' => false ], Response::HTTP_CONFLICT);
 
     }
 
-    protected function emailConfirmation() 
-    {   
+    protected function emailConfirmation()
+    {
         $email = JWTAuth::parseToken()->authenticate()->email;
 
         $user = User::where('email', $email)->first();

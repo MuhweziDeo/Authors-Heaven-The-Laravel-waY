@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ErrorHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,7 +19,7 @@ class ArticleRating extends Model
     protected static function validator(Array $data)
     {
         return Validator::make($data, ArticleRating::$rules,);
-        
+
     }
 
     public static function checkIfUserHasRated($user_uuid, $slug)
@@ -42,7 +43,7 @@ class ArticleRating extends Model
         $ratings = ArticleRating::where('article_slug', $slug)->get();
 
         $ratingsCollection = collect($ratings);
-        $sum  = $ratingsCollection->map( function($rating) { 
+        $sum  = $ratingsCollection->map( function($rating) {
                 return $rating['rating'];
                 })->sum();
         if(count($ratings) > 0) {
@@ -50,7 +51,7 @@ class ArticleRating extends Model
             return $averageRatings;
         }
         return null;
-        
+
     }
 
     protected static function rateArticle(Array $data)
@@ -59,7 +60,7 @@ class ArticleRating extends Model
 
         if ($validator->fails()) {
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
         }
 

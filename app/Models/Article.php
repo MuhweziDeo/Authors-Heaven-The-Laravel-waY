@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ErrorHelper;
 use App\Models\User;
 use App\Models\ArticleDisLike;
 use App\Models\ArticleLike;
@@ -12,18 +13,17 @@ use Illuminate\Support\Carbon;
 use App\Models\ArticleFavorite;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
-use JWTAuth;
 use App\Models\ArticleRating;
 
 class Article extends Model
 {
     //
     protected $fillable = ['title', 'description', 'author_uuid', 'body', 'slug'];
-    
+
     protected $appends = ['isFavourite', 'averageRating', 'hasRated', 'currenUserRating', 'hasBookMarked'];
 
     public function setSlugAttribute($slug)
-    {   
+    {
         $rand = Str::random();
         $this->attributes['slug'] = str_slug($slug . '-' . Carbon::now() . '-' . $rand);
     }
@@ -102,12 +102,12 @@ class Article extends Model
     }
 
 
-    public static function validator(Array $data) 
+    public static function validator(Array $data)
     {
         return Validator::make($data, Article::$rules);
-        
+
     }
-    
+
 
     public static function findArticleBySlug(string $slug)
     {
@@ -124,7 +124,7 @@ class Article extends Model
             return false;
         }
         return true;
-        
+
     }
 
 
@@ -142,7 +142,7 @@ class Article extends Model
 
         if ($validator->fails()) {
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
         }
         return Article::create([
@@ -155,10 +155,10 @@ class Article extends Model
     }
 
     protected static function getAllArticles($limitStart, $limitEnd)
-    {   
+    {
         $start = $limitStart ? $limitStart : 0;
         $end = $limitEnd ? $limitEnd : 10;
-        $articles = Article::with('author.profile', 'likes.likedBy.profile', 
+        $articles = Article::with('author.profile', 'likes.likedBy.profile',
             'disLikes.disLikeBy.profile','favourites.favouriteBy.profile', 'comments.user.profile')
                     ->skip($start)->take($end)->orderBy('created_at', 'DESC')->get();
         return $articles;
@@ -191,7 +191,7 @@ class Article extends Model
             'body'  =>  ['string'] ]);
 
         if($validator->fails()) {
-            return ['errors' => $validator->errors()];
+            return ['errors' => ErrorHelper::formatErrors($validator)];
         }
         return Article::where('slug', $slug)
                         ->first()

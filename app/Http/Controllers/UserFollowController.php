@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserFollow;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 
 class UserFollowController extends Controller
 {
-    //
+    
 
     protected function follow($followee)
     {
@@ -24,7 +23,7 @@ class UserFollowController extends Controller
     }
 
     protected function followers($followee)
-    { 
+    {
         // get users followers
         $followers = UserFollow::getUserFollowers($followee);
         return response()->json([
@@ -47,7 +46,7 @@ class UserFollowController extends Controller
         if (!$follow) {
             return response()->json([
                 'message' => 'You have not followed user before',
-                'sucess' => false
+                'success' => false
             ],Response::HTTP_NOT_ACCEPTABLE);
         }
         $unFollow = UserFollow::unfollowUser($follow);
@@ -56,7 +55,7 @@ class UserFollowController extends Controller
             return response()->json([
                 'message' => 'You have successfully unfollowed user',
                 'sucess' => true
-            ]); 
+            ]);
         }
         return response()->json([
             'message' => 'Unfollowing user was unsuccessful',

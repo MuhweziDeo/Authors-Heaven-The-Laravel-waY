@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\ErrorHelper;
 use JWTAuth;
-use App\Models\User;
 use App\Models\Article;
 use App\Models\Profile;
 use Illuminate\Support\Str;
@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
@@ -46,15 +45,15 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function getJWTIdentifier() 
+    public function getJWTIdentifier()
     {
         return $this->getKey();
     }
-    public function getJWTCustomClaims() 
+    public function getJWTCustomClaims()
     {
         return [];
     }
-    
+
     public function profile()
     {
         return $this->hasOne(Profile::class, 'username', 'username');
@@ -93,7 +92,7 @@ class User extends Authenticatable implements JWTSubject
      * @return \App\User
      */
     protected static function create(array $data)
-    {   
+    {
         $user = new User();
         $user->username = $data['username'];
         $user->email = $data['email'];
@@ -157,7 +156,7 @@ class User extends Authenticatable implements JWTSubject
 
         if ($validator->fails()) {
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
         }
         $user = User::where('email', $email)->first();

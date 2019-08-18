@@ -43,15 +43,15 @@ class LoginController extends Controller
     {
         $credentails = request()->only('email', 'password');
         try {
-           $user  = JWTAuth::attempt($credentails);
-           if (!$user) {
+           $token = JWTAuth::attempt($credentails);
+           if (!$token) {
                return response()->json([
                    'message' => 'Invalid login credentails',
                    'success' => false
                ], Response::HTTP_BAD_REQUEST);
            } 
            return response()->json([
-               'token' => $user,
+               'token' => $token,
                'username' => request('username'),
                'success' => true
            ]);

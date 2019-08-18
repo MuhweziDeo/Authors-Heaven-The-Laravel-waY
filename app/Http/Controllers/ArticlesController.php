@@ -9,6 +9,7 @@ use App\Models\ArticleBookmark;
 use App\Models\ArticleFavorite;
 use \Symfony\Component\HttpFoundation\Response;
 
+
 class ArticlesController extends Controller
 {
     
@@ -175,7 +176,6 @@ class ArticlesController extends Controller
         }
         $data['article_slug'] = $slug;
         $data['user_uuid'] = request()->user->uuid;
-        $likeArticle = \App\Models\ArticleLike::likeArticle($data);
         return response()->json([
             'message' => 'You have sucessfully liked the article',
             'success' => true

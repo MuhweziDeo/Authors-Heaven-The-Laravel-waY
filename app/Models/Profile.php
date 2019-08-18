@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ErrorHelper;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -10,7 +11,7 @@ class Profile extends Model
 {
     //
     protected $fillable = ['first_name', 'last_name', 'image' ];
-    
+
     protected $appends = ['isFollowing'];
     //TODO add isFollowingAttribute;
 
@@ -26,7 +27,7 @@ class Profile extends Model
         }
         return false;
     }
-    
+
     protected static function getProfiles()
     {
         return Profile::with('user')->orderBy('created_at', 'ASC')->paginate(10);
@@ -41,7 +42,7 @@ class Profile extends Model
     {
         return Validator::make($data,[
             'first_name' => ['string', 'min:3'],
-            'last_name' => ['string', 'min:3'], 
+            'last_name' => ['string', 'min:3'],
             'image'  => ['string', 'min:3']
         ]);
     }
@@ -53,14 +54,14 @@ class Profile extends Model
                 'errors' => 'Please enter at least one value of first_name, last_name, image'
             ];
         }
-        
+
         $validator = Profile::validator(request()->all());
 
         if ($validator->fails()) {
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
-        } 
+        }
         return Profile::where('username', $username)
                         ->update($data);
     }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ArticleLike extends Model
 {
-    //
     protected $fillable = ['article_slug','user_uuid'];
 
     public function article()

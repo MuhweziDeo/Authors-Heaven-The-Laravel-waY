@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ErrorHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ class Comment extends Model
         'comment_body' => ['string', 'required']
     ];
 
-   
+
     public function user()
     {
        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
@@ -29,15 +30,15 @@ class Comment extends Model
 
     protected static function validator(Array $data)
     {
-        
+
         return Validator::make($data, Comment::$rules);
-        
+
     }
 
 
     protected static function checkIsOwner(Request $request, Comment $comment)
     {
-        
+
         return $request->user->uuid === $comment->user_uuid;
 
     }
@@ -53,10 +54,10 @@ class Comment extends Model
 
         if($validator->fails()){
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
         }
-  
+
 
         return Comment::create([
             'comment_body' => $data['comment_body'],
@@ -76,7 +77,7 @@ class Comment extends Model
 
         if($validator->fails()){
             return [
-                'errors' => $validator->errors()
+                'errors' => ErrorHelper::formatErrors($validator)
             ];
         }
 
